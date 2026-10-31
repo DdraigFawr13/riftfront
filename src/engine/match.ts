@@ -266,6 +266,18 @@ function startRound(s: MatchState): void {
   checkOutcome(s, "deckout");
 }
 
+/**
+ * Preview the end of the current round (movement then combat) without starting the next one.
+ * The AI and, later, the UI's attack previews use this, so previews run the real rules (GAME-02).
+ */
+export function previewRoundEnd(state: MatchState): MatchState {
+  const s = structuredClone(state);
+  s.events = [];
+  resolveMovement(s);
+  resolveCombat(s);
+  return s;
+}
+
 /** Re-run a match from its setup and action log (D-008). */
 export function replay(setup: MatchSetup, actions: Action[]): MatchState {
   return actions.reduce(applyAction, createMatch(setup));

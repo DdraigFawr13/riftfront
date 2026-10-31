@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run typecheck && npm test",
-    "sample": "node --experimental-strip-types --no-warnings scripts/sample-match.ts"
+    "sample": "node --experimental-strip-types --no-warnings scripts/sample-match.ts",
+    "sim": "node --experimental-strip-types --no-warnings scripts/sim.ts"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
