@@ -113,7 +113,8 @@ All numbers below are starting values held in config; the harness and playtests 
   - Playing a card is select card → tap a highlighted tile → Confirm. Cancel is the only undo (D-005).
   - Unit stance and repositioning are buttons that appear when you tap your unit. Long-press (or right-click) inspects any card, unit or tile.
   - A five-line event ticker shows what just happened, written from the player's view. It is a minimal stand-in for the combat log, which stays a later item (D-009); without it, round resolution moves units with no explanation.
-  - Art is drawn in CSS (ink-and-paper tokens stamped with two-letter card initials), so the first build needs no assets from the art repo.
+  - Art: an original ink-stamp SVG emblem for each card, drawn for this project in `src/ui/art.tsx`, plus drawn trees and walls for terrain. There is no third-party art, so there is nothing to license (SAFE-05) and nothing needed yet from the art repo.
+  - Motion: tokens stamp in when deployed, hit units shake and show floating damage, and terrain grows in. A Commander's health flashes when it drops. All of it is off under reduced motion.
   - Matches save the setup plus the action log after every action (save version 1). A save that can't be resumed is kept under a dated key, never overwritten.
   - The first-load budget is 90 KB gzipped, checked on every build. The first build measured 79.1 KB.
 - **Why:** D-010 (phone landscape, layout A, long-press inspect, autosave), GAME-04 (visible consequences), GAME-05 (versioned saves) and WEB-06 (bundle budget).
