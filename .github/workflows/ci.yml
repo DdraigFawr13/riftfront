@@ -1,5 +1,4 @@
-# From the AI-Master-Instructions template. Only the drift check until code exists;
-# add setup-node, npm ci and npm run check with the first package.json.
+# From the AI-Master-Instructions template (core/templates/github/ci.yml).
 name: CI
 
 on:
@@ -19,7 +18,13 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
       - run: node .claude/master/sync.mjs --check
+      - run: npm run check

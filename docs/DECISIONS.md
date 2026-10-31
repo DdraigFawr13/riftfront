@@ -69,3 +69,18 @@ All numbers below are starting values held in config; the harness and playtests 
 - **Status:** Accepted (2026-10-31)
 - **Decision:** Setting: The War Table, two map-makers commanding toy armies on a living map whose terrain is inked onto it. Style: ink and paper (map, parchment, stamped tokens). Art lives in a separate private repo with a per-asset licence ledger; each licence must allow use in a published web game. "Riftfront" is the working title; rename at phase 4.
 - **Why:** review 1 and final page. This repo is public, and many free packs forbid sharing raw files.
+
+## D-012 Engine details chosen in phase 1
+
+- **Status:** Proposed (2026-10-31). Small forks picked as defaults (WS-02); the harness or Morgan can change any of them.
+- **Decision:**
+  - A unit card defaults to "hold" if its range is 2 or more, otherwise "advance".
+  - Reposition is one tile forward or back in the unit's own lane, once per round, not on the deploy round; lanes stay fixed (D-007).
+  - Changing stance costs an action.
+  - A breaching unit attacks the Commander rather than a unit.
+  - Ranged units have no minimum range yet, and no unit attacks enemies behind it.
+  - When two Guards could intercept, the lower lane does; each Guard intercepts once per round.
+  - Both players draw in round 1.
+  - Energy refills each round and does not carry over.
+  - Safety caps: 40 actions per round, and a draw after 40 rounds.
+- **Why:** the concept left these open; each is the simplest version consistent with D-004 to D-007.

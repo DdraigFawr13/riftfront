@@ -3,6 +3,7 @@
 Approved by Morgan on 2026-10-31. Rules are in `docs/DECISIONS.md` (D-003 to D-011); this file holds the build order and how each step is checked.
 
 Planning pages (answers saved in each page's database):
+
 - Round 1: https://claude.ai/artifact/TmJCuUPdreS2mc57AmVgk6 (summary: `docs/planning/round1-answers.md`)
 - Review 1 and round 2: https://claude.ai/artifact/HJtJeNtgCbPRjDRkw5Dooz
 - Final plan and approval: https://claude.ai/artifact/5aAstu32A4aXw875Es5Grc

@@ -4,17 +4,18 @@ Updated: 2026-10-31. A fresh session must be able to continue from this file alo
 
 ## Phase
 
-Plan approved 2026-10-31 (`docs/plan.md`, rules in DECISIONS D-003 to D-011). Next: phase 1, engine core.
+Phase 1, engine core (`docs/plan.md`). Rules: DECISIONS D-003 to D-011; engine defaults D-012 (Proposed).
 
 ## Just done
 
+- 2026-10-31 Phase 1 engine core: `src/engine/` (board, movement, combat, both Commander presets, deck/hand/energy/initiative, deck-out, seeded RNG, action log, replay), 32 tests, sample match in `docs/reports/phase1-sample-match.md`. PR #1 merged.
 - 2026-10-31 Final plan approved; DECISIONS D-003 to D-011 and `docs/plan.md` written. Planning pages are linked from the plan.
 - 2026-10-31 Repo bootstrapped: AI-Master-Instructions v0.5.0 (core, node-web, game), concept v0.2 added, drift-check CI.
 
 ## Next
 
-1. Morgan merges PR #1 (bootstrap + plan). Then restart the work branch from `main` and build phase 1 (engine core) in its own PR.
-2. Phase 1 adds package.json, pinned Node (.nvmrc), Vitest and the npm check script to AGENTS.md and ci.yml.
+1. Merge the phase 1 PR when CI is green (Morgan's standing go-ahead, AGENTS.md).
+2. Phase 2: rule-based AI (own information only, separate seeded stream) and the batch harness with seat swapping; report rounds, end causes and first-player rate against the D-008 targets for both presets.
 
 ## Open questions
 
@@ -23,4 +24,5 @@ Plan approved 2026-10-31 (`docs/plan.md`, rules in DECISIONS D-003 to D-011). Ne
 
 ## Decisions since the last plan update
 
-- 2026-10-31 D-001 to D-011 accepted (plan approval).
+- 2026-10-31 D-001 to D-011 accepted (plan approval). D-012 engine defaults Proposed.
+- 2026-10-31 Morgan: Claude may open and merge PRs once a design is approved and checks pass.
