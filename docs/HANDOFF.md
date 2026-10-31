@@ -12,7 +12,7 @@ Concept workshop on `docs/concept.md` (v0.2), run as a planning interview. No co
 
 ## Next
 
-1. Workshop the concept with Morgan: critique in chat, then planning-interview round 1.
+1. Workshop round 1 form is live: https://claude.ai/artifact/TmJCuUPdreS2mc57AmVgk6 (collection `round1`). Read answers when Morgan says "round 1 done", then run the review round.
 2. After approval: record decisions here and in DECISIONS, then scaffold the engine.
 
 ## Open questions
