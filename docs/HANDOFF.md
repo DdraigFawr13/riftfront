@@ -8,6 +8,7 @@ Phase 4, phone UI (`docs/plan.md`). Rules: DECISIONS D-003 to D-011, D-014; Prop
 
 ## Just done
 
+- 2026-10-31 Live: https://riftfront-golden-goose-engineering-group.vercel.app (Vercel `prj_3vOXOml26CsD4nTwqm2cP3tySGgM`, first deploy of `51a8887`, bundle hash checked). PR #7 (art) merged.
 - 2026-10-31 Art pass: SVG emblems for all 16 cards, terrain art, owner-coloured walls, deploy/hit/damage animations (D-015). Checked at 844×390.
 - 2026-10-31 Phase 4 UI: React + Vite app in `src/ui/` (menu, mulligan, board, hand, confirm, inspector, ticker, end screen, autosave), checked in a phone-landscape browser (844×390). D-005 bonus dropped (PR #5).
 - 2026-10-31 Phase 3: Ironbound and Verdant (8 cards each, `src/content/factions.ts`); engine support for walls, Forest, Woodland, Siege, structures, equipment (D-013); tuned 3 cards (D-014). Reports: `docs/reports/phase3-harness.md`, `phase3-cards.md`, `phase3-sample-match.md`. PRs #3 and #4 merged.
@@ -18,8 +19,8 @@ Phase 4, phone UI (`docs/plan.md`). Rules: DECISIONS D-003 to D-011, D-014; Prop
 
 ## Next
 
-1. Merge the art PR when CI is green.
-2. Vercel: the GitHub default branch is still `ccr-595af36c-42y2l7`, so the project is created without a Git link and `main` is deployed to production through the API after each merge (CI-05). Once Morgan sets the default branch to `main`, link Git for automatic deploys. Project in team Golden Goose Engineering Group (`team_TkIZa8OAntpECUBD4be85vQK`): framework vite, `npm run build`, output `dist`, preview deployments off. Check the deployed commit equals the merge commit.
+1. Merge the hand-list fix PR, then deploy its merge commit to production (AGENTS.md "Deploys").
+2. When Morgan sets the GitHub default branch to `main`, link the Vercel project to Git for automatic production deploys from `main` (preview deploys stay off).
 3. Morgan playtests on the phone and records findings (GAME-06).
 
 ## Open questions
