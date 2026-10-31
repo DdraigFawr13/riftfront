@@ -1,5 +1,7 @@
 # RIFTFRONT — Game Concept & Prototype Proposal v0.2
 
+> **Status note (2026-10-31):** this is the original v0.2 proposal, kept for reference. Where it differs, `docs/DECISIONS.md` wins.
+
 **Status:** Exploratory design; territorial breach selected for the first playtest, with immediate unblocked-lane damage preserved as an alternative.  
 **Genre:** 1v1 tactical card battler with mutable terrain, commanders, and deck customization.  
 **Platform target:** Browser-first, desktop-oriented UI that can adapt to tablets.  

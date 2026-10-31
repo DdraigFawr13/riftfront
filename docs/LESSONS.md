@@ -4,4 +4,4 @@ One line per mistake. Read the entries for an area before working in it. When a 
 
 Format: `- <area> · <mistake> · <root cause> · <rule> · ×<n> (<YYYY-MM-DD>)`
 
-- None yet.
+- design · Recommended a collision rule ("fight across the gap") that deadlocks at melee range 1 · option written without checking it against the range rules · check every proposed rule against existing stats before offering it · ×1 (2026-10-31)
