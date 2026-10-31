@@ -104,3 +104,16 @@ All numbers below are starting values held in config; the harness and playtests 
 - **Status:** Accepted (2026-10-31) under D-008, which lets the harness tune values.
 - **Decision:** card stats are as in `src/content/factions.ts` and `docs/reports/phase3-cards.md`. Iron Footman, Thornback and Barkhide have 3 attack.
 - **Why:** measured over 400 games in breach mode: median 10 rounds, Ironbound 48% vs Verdant 52%, 95% of games end in combat (`docs/reports/phase3-harness.md`).
+
+## D-015 First phone UI
+
+- **Status:** Proposed (2026-10-31). Choices made building phase 4; Morgan's playtests decide them.
+- **Decision:**
+  - The player always sits on the left against the AI. The menu picks the player's faction (the AI gets the other) and the Commander damage preset.
+  - Playing a card is select card → tap a highlighted tile → Confirm. Cancel is the only undo (D-005).
+  - Unit stance and repositioning are buttons that appear when you tap your unit. Long-press (or right-click) inspects any card, unit or tile.
+  - A five-line event ticker shows what just happened, written from the player's view. It is a minimal stand-in for the combat log, which stays a later item (D-009); without it, round resolution moves units with no explanation.
+  - Art is drawn in CSS (ink-and-paper tokens stamped with two-letter card initials), so the first build needs no assets from the art repo.
+  - Matches save the setup plus the action log after every action (save version 1). A save that can't be resumed is kept under a dated key, never overwritten.
+  - The first-load budget is 90 KB gzipped, checked on every build. The first build measured 79.1 KB.
+- **Why:** D-010 (phone landscape, layout A, long-press inspect, autosave), GAME-04 (visible consequences), GAME-05 (versioned saves) and WEB-06 (bundle budget).
