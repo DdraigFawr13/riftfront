@@ -31,9 +31,9 @@ All numbers below are starting values held in config; the harness and playtests 
 ## D-005 Round structure and initiative
 
 - **Status:** Accepted (2026-10-31)
-- **Decision:** Each round: both draw 1; energy refills (starts 2, +1 per round, cap 8); players alternate single actions (play a card, reposition or re-stance a unit, or pass); passing locks you out for the round; then movement, simultaneous combat, cleanup. Initiative alternates each round; the second player in round 1 gets +1 energy that round. Undo only cancels targeting before confirming.
-- **Why:** rounds 1 and review 1. Pass lockout stops both players waiting each other out; alternating initiative plus the round 1 bonus offsets acting order.
-- **Note (2026-10-31):** Morgan kept the round 1 bonus pending a recheck with real cards. Measured with phase 3 cards: breach first-player wins 45.0% with it, 50% without (`docs/reports/phase3-harness.md`).
+- **Decision:** Each round: both draw 1; energy refills (starts 2, +1 per round, cap 8); players alternate single actions (play a card, reposition or re-stance a unit, or pass); passing locks you out for the round; then movement, simultaneous combat, cleanup. Initiative alternates each round. No energy bonus for either player. Undo only cancels targeting before confirming.
+- **Why:** rounds 1 and review 1. Pass lockout stops both players waiting each other out, and alternating initiative evens out acting order.
+- **Revised (2026-10-31):** the round 1 +1 energy bonus for the second player was dropped by Morgan after the harness recheck with phase 3 cards. In breach mode the first player won 45.0% with the bonus and 50% without; in unblocked lane, 42.7% with it and 53% without (`docs/reports/phase3-harness.md`). The config value stays, set to 0.
 
 ## D-006 Decks, hand and anti-stall
 

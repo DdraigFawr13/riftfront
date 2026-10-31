@@ -15,7 +15,7 @@ export interface RulesConfig {
   startEnergy: number;
   energyPerRound: number;
   energyCap: number;
-  /** Extra energy for the player acting second in round 1 (D-005). */
+  /** Extra energy for the player acting second in round 1. 0 since D-005 was revised. */
   secondPlayerRound1Bonus: number;
   openingHand: number;
   drawPerRound: number;
@@ -46,7 +46,7 @@ export const DEFAULT_RULES: RulesConfig = {
   startEnergy: 2,
   energyPerRound: 1,
   energyCap: 8,
-  secondPlayerRound1Bonus: 1,
+  secondPlayerRound1Bonus: 0,
   openingHand: 5,
   drawPerRound: 1,
   deckOutStep: 1,

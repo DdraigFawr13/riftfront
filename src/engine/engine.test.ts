@@ -72,12 +72,17 @@ describe("setup and economy", () => {
     expect(s.players[0].deck).toHaveLength(10);
   });
 
-  it("gives the round 1 second player +1 energy, then ramps to the cap (D-005)", () => {
-    let s = started();
-    const first = s.initiative;
-    const second = first === 0 ? 1 : 0;
-    expect(s.players[first].energy).toBe(2);
+  it("gives the round 1 second player a bonus only when configured (D-005)", () => {
+    const s = started(1, { secondPlayerRound1Bonus: 1 });
+    const second = s.initiative === 0 ? 1 : 0;
+    expect(s.players[s.initiative].energy).toBe(2);
     expect(s.players[second].energy).toBe(3);
+  });
+
+  it("starts both players on 2 energy, then ramps to the cap (D-005)", () => {
+    let s = started();
+    expect(s.players[0].energy).toBe(2);
+    expect(s.players[1].energy).toBe(2);
     for (let r = 2; r <= 9; r++) {
       s = passBoth(s);
       expect(s.round).toBe(r);
