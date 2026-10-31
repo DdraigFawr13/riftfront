@@ -1,6 +1,6 @@
 # Agent instructions
 
-Riftfront is a browser-first 1v1 tactical card battler: decks, Commanders, four lanes on an 8x4 grid, and mutable terrain. Owner: Morgan. Stage: concept workshop, no code yet.
+Riftfront is a browser-first 1v1 tactical card battler: decks, Commanders, four lanes on an 8x4 grid, and mutable terrain. Owner: Morgan. Stage: plan approved 2026-10-31 (`docs/plan.md`); phase 1, engine core, is next.
 
 Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.claude/master/RULES.md`). This file holds only what is specific to this project. Keep it under 80 lines.
 
@@ -9,7 +9,7 @@ Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.clau
 1. `docs/HANDOFF.md`: current state and next step.
 2. `docs/DECISIONS.md`: settled rules. Don't reopen them.
 3. `docs/LESSONS.md`: entries for the area you are about to work in.
-4. `docs/concept.md`: the design proposal. Open only the section the task needs; section 15 is the latest decision log.
+4. `docs/plan.md`: build steps. `docs/concept.md` is the original proposal; DECISIONS overrides it.
 
 ## Local checks (run before pushing)
 
