@@ -22,7 +22,7 @@ Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.clau
 
 - **CI** (`ci.yml`): `npm ci`, drift check, `npm run check` and `npm run build` on every PR update and `main` push. Markdown and `docs/` changes skip it.
 - **Prune merged branches** (synced): deletes merged PR branches.
-- No deploys yet.
+- **Deploys:** Vercel project `riftfront` (team Golden Goose Engineering Group) at https://riftfront-golden-goose-engineering-group.vercel.app, not linked to Git. After each merge to `main`, Claude deploys that merge commit to production through the Vercel API and checks the live bundle hash matches a local build of the same commit (CI-05). No preview deploys.
 
 ## Project rules
 

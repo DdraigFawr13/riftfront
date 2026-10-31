@@ -351,6 +351,7 @@ legend {
 }
 .card {
   display: grid;
+  flex: 0 0 auto;
   grid-template-columns: 22px 1fr;
   grid-template-rows: auto auto;
   column-gap: 6px;
