@@ -235,17 +235,15 @@ legend {
 }
 .t-forest {
   background-color: color-mix(in srgb, var(--forest) 22%, var(--paper-3));
-  background-image:
-    radial-gradient(circle at 25% 30%, var(--forest) 0 2px, transparent 3px),
-    radial-gradient(circle at 70% 65%, var(--forest) 0 2px, transparent 3px),
-    radial-gradient(circle at 75% 20%, var(--forest) 0 1.5px, transparent 2.5px);
 }
 .t-wall {
-  background: repeating-linear-gradient(
-    135deg,
-    var(--stone) 0 4px,
-    color-mix(in srgb, var(--stone) 60%, var(--paper-3)) 4px 8px
-  );
+  background: var(--stone);
+}
+.tile.t-wall.t-you {
+  box-shadow: inset 0 0 0 3px var(--you);
+}
+.tile.t-wall.t-foe {
+  box-shadow: inset 0 0 0 3px var(--foe);
 }
 .wall-hp {
   position: absolute;
@@ -519,5 +517,188 @@ legend {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+}
+
+/* Art: ink-stamp emblems (src/ui/art.tsx) */
+.token .art {
+  width: 62%;
+  height: 62%;
+}
+.terrain-art {
+  position: absolute;
+  inset: 14%;
+  width: 72%;
+  height: 72%;
+  pointer-events: none;
+}
+.t-forest .terrain-art {
+  color: var(--forest);
+  opacity: 0.55;
+}
+.t-wall .terrain-art {
+  color: var(--paper-3);
+  opacity: 0.85;
+}
+.t-forest:has(.token) .terrain-art {
+  opacity: 0.3;
+}
+.card {
+  grid-template-columns: 22px 1fr 24px;
+}
+.card .card-art {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  color: var(--ink-soft);
+}
+.card.f-ironbound .card-art {
+  color: var(--you);
+}
+.card.f-verdant .card-art {
+  color: var(--forest);
+}
+.inspect-art {
+  float: right;
+  width: 64px;
+  height: 64px;
+  margin: 0 0 6px 12px;
+  color: var(--ink);
+}
+.inspect-art.f-ironbound,
+.inspect-art.ink-you {
+  color: var(--you);
+}
+.inspect-art.f-verdant {
+  color: var(--forest);
+}
+.inspect-art.ink-foe {
+  color: var(--foe);
+}
+.crest {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+.crest.f-ironbound {
+  color: var(--you);
+}
+.crest.f-verdant {
+  color: var(--forest);
+}
+
+/* Motion: tokens stamp onto the map, hits shake and float their damage, Commanders flash. */
+.dmg {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+  font: 800 max(14px, calc(var(--tile) * 0.3)) / 1 var(--serif);
+  color: var(--foe);
+  text-shadow:
+    0 1px 0 var(--paper-3),
+    0 -1px 0 var(--paper-3),
+    1px 0 0 var(--paper-3),
+    -1px 0 0 var(--paper-3);
+  pointer-events: none;
+  animation: rise 1s ease-out forwards;
+  z-index: 3;
+}
+.token.you .dmg {
+  color: var(--foe);
+}
+.token.foe .dmg {
+  color: var(--you);
+}
+@keyframes rise {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.2);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -110%) scale(1);
+  }
+}
+.token.arrive {
+  animation: stamp 420ms cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes stamp {
+  from {
+    transform: scale(1.6) rotate(-12deg);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+.shake {
+  animation: shake 360ms ease-in-out;
+}
+.token.shake {
+  background: color-mix(in srgb, var(--foe) 18%, var(--paper-3));
+}
+@keyframes shake {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: -3px 0;
+  }
+  40% {
+    translate: 3px 0;
+  }
+  60% {
+    translate: -2px 0;
+  }
+  80% {
+    translate: 2px 0;
+  }
+}
+.tile.planted .terrain-art {
+  animation: grow 500ms ease-out both;
+}
+@keyframes grow {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+.hp-hit {
+  animation: flash 900ms ease-out;
+}
+@keyframes flash {
+  0%,
+  40% {
+    background: color-mix(in srgb, var(--foe) 30%, transparent);
+    transform: scale(1.12);
+  }
+  100% {
+    background: transparent;
+    transform: scale(1);
+  }
+}
+.side-you,
+.side-foe {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dmg,
+  .token.arrive,
+  .shake,
+  .tile.planted .terrain-art,
+  .hp-hit {
+    animation: none;
+  }
+  .dmg {
+    opacity: 1;
   }
 }

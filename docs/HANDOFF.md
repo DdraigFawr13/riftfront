@@ -8,6 +8,7 @@ Phase 4, phone UI (`docs/plan.md`). Rules: DECISIONS D-003 to D-011, D-014; Prop
 
 ## Just done
 
+- 2026-10-31 Art pass: SVG emblems for all 16 cards, terrain art, owner-coloured walls, deploy/hit/damage animations (D-015). Checked at 844×390.
 - 2026-10-31 Phase 4 UI: React + Vite app in `src/ui/` (menu, mulligan, board, hand, confirm, inspector, ticker, end screen, autosave), checked in a phone-landscape browser (844×390). D-005 bonus dropped (PR #5).
 - 2026-10-31 Phase 3: Ironbound and Verdant (8 cards each, `src/content/factions.ts`); engine support for walls, Forest, Woodland, Siege, structures, equipment (D-013); tuned 3 cards (D-014). Reports: `docs/reports/phase3-harness.md`, `phase3-cards.md`, `phase3-sample-match.md`. PRs #3 and #4 merged.
 - 2026-10-31 Phase 2: rule-based AI (`src/ai/`, sees only its own information), harness (`src/sim/`), `npm run sim`. Report `docs/reports/phase2-harness.md`: both presets meet the combat-end and median-round targets; breach first-player win rate is 35% because of the round 1 energy bonus (53% without it).
@@ -17,8 +18,8 @@ Phase 4, phone UI (`docs/plan.md`). Rules: DECISIONS D-003 to D-011, D-014; Prop
 
 ## Next
 
-1. Merge the phase 4 UI PR when CI is green.
-2. Vercel: blocked until Morgan sets the GitHub default branch to `main` (it is still `ccr-595af36c-42y2l7`, which Vercel would treat as production; CI-05). Then create the project in team Golden Goose Engineering Group (`team_TkIZa8OAntpECUBD4be85vQK`): framework vite, `npm run build`, output `dist`, preview deployments off. Check the deployed commit equals the merge commit.
+1. Merge the art PR when CI is green.
+2. Vercel: the GitHub default branch is still `ccr-595af36c-42y2l7`, so the project is created without a Git link and `main` is deployed to production through the API after each merge (CI-05). Once Morgan sets the default branch to `main`, link Git for automatic deploys. Project in team Golden Goose Engineering Group (`team_TkIZa8OAntpECUBD4be85vQK`): framework vite, `npm run build`, output `dist`, preview deployments off. Check the deployed commit equals the merge commit.
 3. Morgan playtests on the phone and records findings (GAME-06).
 
 ## Open questions

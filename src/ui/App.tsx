@@ -22,6 +22,7 @@ import {
   type Save,
   type Storage,
 } from "./session.ts";
+import { CardArt } from "./art.tsx";
 import { cardLine, KEYWORDS, stamp, yourView } from "./text.ts";
 import { useLongPress } from "./useLongPress.ts";
 
@@ -116,6 +117,10 @@ function Menu(props: {
                 checked={faction === f}
                 onChange={() => setFaction(f)}
               />
+              <CardArt
+                id={f === "ironbound" ? "ib_tower" : "vd_treant"}
+                className={`crest f-${f}`}
+              />
               {FACTIONS[f]}
             </label>
           ))}
@@ -209,6 +214,15 @@ function Game(props: {
   };
 
   const me = s.players[YOU];
+  // Flash a Commander's health when it drops; the key change restarts the animation.
+  const lastHp = useRef<[number, number]>([s.players[0].hp, s.players[1].hp]);
+  const hpDrop: [boolean, boolean] = [
+    s.players[0].hp < lastHp.current[0],
+    s.players[1].hp < lastHp.current[1],
+  ];
+  useEffect(() => {
+    lastHp.current = [s.players[0].hp, s.players[1].hp];
+  }, [s]);
   const foe = s.players[1];
   const selUnit = sel?.type === "unit" ? s.units.find((u) => u.uid === sel.uid) : undefined;
   const unitActions = selUnit
@@ -231,15 +245,17 @@ function Game(props: {
   return (
     <div className="game">
       <header className="topbar">
-        <span className="side-you">You {me.hp} ♥</span>
+        <span key={`you-${me.hp}`} className={hpDrop[0] ? "side-you hp-hit" : "side-you"}>
+          You {Math.max(0, me.hp)} ♥
+        </span>
         <span className="energy" aria-label={`${me.energy} energy`}>
           ⚡{me.energy}
         </span>
         <span className="status">
           Round {Math.max(1, s.round)} · {status}
         </span>
-        <span className="side-foe">
-          Enemy {foe.hp} ♥ · {foe.hand.length} cards
+        <span key={`foe-${foe.hp}`} className={hpDrop[1] ? "side-foe hp-hit" : "side-foe"}>
+          Enemy {Math.max(0, foe.hp)} ♥ · {foe.hand.length} cards
         </span>
         <button type="button" className="menu-btn" onClick={props.openMenu} aria-label="Menu">
           ☰
@@ -351,6 +367,7 @@ function HandCard(props: {
     <button type="button" className={cls.join(" ")} aria-pressed={props.selected} {...press}>
       <span className="cost">{c.cost}</span>
       <span className="name">{c.name}</span>
+      <CardArt id={c.id} className="card-art" />
       <span className="line">
         {c.kind === "unit" || c.kind === "structure"
           ? `${c.attack}/${c.health} r${c.range}`
@@ -383,6 +400,7 @@ function Mulligan({ s, act }: { s: MatchState; act: (a: Action) => void }) {
             >
               <span className="cost">{CARDS[id]?.cost}</span>
               <span className="name">{CARDS[id]?.name}</span>
+              <CardArt id={id} className="card-art" />
             </button>
           ))}
         </div>
@@ -404,6 +422,7 @@ function Inspector({ s, what, close }: { s: MatchState; what: Inspect; close: ()
     const c = CARDS[what.cardId]!;
     body = (
       <>
+        <CardArt id={c.id} className={`inspect-art f-${c.faction}`} />
         <h2>{c.name}</h2>
         <p className="meta">
           Cost {c.cost} · {c.kind} · {c.faction}
@@ -419,6 +438,7 @@ function Inspector({ s, what, close }: { s: MatchState; what: Inspect; close: ()
     body =
       u && c ? (
         <>
+          <CardArt id={c.id} className={`inspect-art ${u.owner === YOU ? "ink-you" : "ink-foe"}`} />
           <h2>
             {u.owner === YOU ? "Your" : "Enemy"} {c.name}
           </h2>
