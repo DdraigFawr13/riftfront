@@ -3,12 +3,18 @@ export type PlayerId = 0 | 1;
 export type Stance = "advance" | "hold";
 export type CommanderDamageMode = "territorial_breach" | "unblocked_lane";
 
-export interface UnitCard {
+interface CardBase {
   id: string;
   name: string;
   faction: string;
-  kind: "unit";
   cost: number;
+  /** One line of rules text for the UI and reports. */
+  text?: string;
+}
+
+/** A unit, or a structure: a unit that never moves (D-009). */
+export interface UnitCard extends CardBase {
+  kind: "unit" | "structure";
   attack: number;
   health: number;
   range: number;
@@ -17,9 +23,32 @@ export interface UnitCard {
   stance?: Stance;
   keywords?: Keyword[];
 }
-export type Keyword = "guard" | "rush";
-/** Phase 1 only has units; terrain, structures and equipment arrive with phase 3 content (D-009). */
-export type Card = UnitCard;
+/**
+ * guard: takes a hit aimed at a friend in the same column of an adjacent lane.
+ * rush: acts on the round it is deployed. siege: double damage to walls and structures.
+ * woodland: +1 attack while standing in Forest.
+ */
+export type Keyword = "guard" | "rush" | "siege" | "woodland";
+
+export interface TerrainDef {
+  kind: string;
+  blocksMovement: boolean;
+  /** Walls have health and can be attacked by the other player's units. */
+  hp?: number;
+  /** Damage removed from each ranged (range 2+) attack on a unit standing here. */
+  rangedCover?: number;
+}
+export interface TerrainCard extends CardBase {
+  kind: "terrain";
+  terrain: TerrainDef;
+  /** single: the target tile. column3: the target tile and the same column in adjacent lanes. */
+  shape: "single" | "column3";
+}
+export interface EquipmentCard extends CardBase {
+  kind: "equipment";
+  mods: { attack?: number; health?: number; range?: number; keywords?: Keyword[] };
+}
+export type Card = UnitCard | TerrainCard | EquipmentCard;
 export type CardDb = Readonly<Record<string, Card>>;
 
 export interface Unit {
@@ -34,14 +63,16 @@ export interface Unit {
   move: number;
   stance: Stance;
   keywords: Keyword[];
+  /** Structures never move, reposition or change stance. */
+  structure: boolean;
   deployedRound: number;
   repositionedRound: number;
 }
 
-export interface Terrain {
-  kind: string;
-  /** Blocks movement, ranged fire and Commander attacks in its lane (D-004). */
-  blocksMovement: boolean;
+/** Terrain on a tile. Blocking terrain stops movement, ranged fire and Commander attacks (D-004). */
+export interface Terrain extends TerrainDef {
+  /** Who placed it; the other player's units can attack it if it has hp. */
+  owner?: PlayerId;
 }
 
 export interface PlayerState {
@@ -100,12 +131,16 @@ export type GameEvent =
   | { t: "energy"; player: PlayerId; energy: number }
   | { t: "mulligan"; player: PlayerId; count: number }
   | { t: "play"; player: PlayerId; cardId: string; uid: number; lane: number; col: number }
+  | { t: "terrain"; player: PlayerId; cardId: string; kind: string; lane: number; col: number }
+  | { t: "equip"; player: PlayerId; cardId: string; uid: number }
   | { t: "stance"; uid: number; stance: Stance }
   | { t: "reposition"; uid: number; from: number; to: number }
   | { t: "pass"; player: PlayerId }
   | { t: "action_cap"; round: number }
   | { t: "move"; uid: number; lane: number; from: number; to: number }
   | { t: "attack"; uid: number; target: number; damage: number; guardedBy?: number }
+  | { t: "attack_terrain"; uid: number; kind: string; lane: number; col: number; damage: number }
+  | { t: "terrain_destroyed"; kind: string; lane: number; col: number }
   | { t: "commander_hit"; uid: number; player: PlayerId; damage: number }
   | { t: "death"; uid: number }
   | { t: "end"; outcome: Outcome };

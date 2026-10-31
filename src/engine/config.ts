@@ -6,6 +6,8 @@ export interface RulesConfig {
   lanes: number;
   /** Deploy columns per player, inclusive range. */
   deployZone: [[number, number], [number, number]];
+  /** Where a player may place terrain: their deploy zone plus the neutral columns (D-013). */
+  terrainZone: [[number, number], [number, number]];
   /** First column (0-indexed) of the enemy backfield that counts as a breach, per attacking player. */
   breachColumn: [number, number];
   commanderDamageMode: CommanderDamageMode;
@@ -24,7 +26,7 @@ export interface RulesConfig {
   maxRounds: number;
 }
 
-export const RULES_VERSION = "0.1.0";
+export const RULES_VERSION = "0.2.0";
 
 /** D-003 to D-007 starting values. Breach at board columns 6 / 3 is index 5 / 2. */
 export const DEFAULT_RULES: RulesConfig = {
@@ -33,6 +35,10 @@ export const DEFAULT_RULES: RulesConfig = {
   deployZone: [
     [0, 2],
     [5, 7],
+  ],
+  terrainZone: [
+    [0, 4],
+    [3, 7],
   ],
   breachColumn: [5, 2],
   commanderDamageMode: "territorial_breach",

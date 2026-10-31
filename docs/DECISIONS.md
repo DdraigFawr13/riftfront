@@ -33,6 +33,7 @@ All numbers below are starting values held in config; the harness and playtests 
 - **Status:** Accepted (2026-10-31)
 - **Decision:** Each round: both draw 1; energy refills (starts 2, +1 per round, cap 8); players alternate single actions (play a card, reposition or re-stance a unit, or pass); passing locks you out for the round; then movement, simultaneous combat, cleanup. Initiative alternates each round; the second player in round 1 gets +1 energy that round. Undo only cancels targeting before confirming.
 - **Why:** rounds 1 and review 1. Pass lockout stops both players waiting each other out; alternating initiative plus the round 1 bonus offsets acting order.
+- **Note (2026-10-31):** Morgan kept the round 1 bonus pending a recheck with real cards. Measured with phase 3 cards: breach first-player wins 45.0% with it, 50% without (`docs/reports/phase3-harness.md`).
 
 ## D-006 Decks, hand and anti-stall
 
@@ -84,3 +85,22 @@ All numbers below are starting values held in config; the harness and playtests 
   - Energy refills each round and does not carry over.
   - Safety caps: 40 actions per round, and a draw after 40 rounds.
 - **Why:** the concept left these open; each is the simplest version consistent with D-004 to D-007.
+
+## D-013 Terrain, structures and equipment rules
+
+- **Status:** Proposed (2026-10-31). Chosen in phase 3 to build the D-009 content.
+- **Decision:**
+  - **Terrain placement:** in the player's own half (their deploy zone plus the neutral columns). A blocking piece (wall, structure) can't go ahead of an enemy intruder (as D-004).
+  - **Stone Wall:** 6 health. The other player's units attack it as a target in their lane, and their own units never do. It blocks movement, ranged fire and breaches.
+  - **Siege:** double damage to walls and structures.
+  - **Forest:** coexists with units. Ranged (range 2+) hits on a unit standing in it deal 1 less. Woodland units get +1 attack while standing in it.
+  - **Spreading Grove:** plants Forest on the target tile and the same column in adjacent lanes.
+  - **Structures:** units that never move, reposition or change stance.
+  - **Equipment:** permanently adds its modifiers to one of the player's own non-structure units.
+- **Why:** the concept named these effects without exact rules. Each choice is the simplest version that makes the factions differ: Ironbound fortifies and breaks walls; Verdant gains from Forest.
+
+## D-014 First tuned card values
+
+- **Status:** Accepted (2026-10-31) under D-008, which lets the harness tune values.
+- **Decision:** card stats are as in `src/content/factions.ts` and `docs/reports/phase3-cards.md`. Iron Footman, Thornback and Barkhide have 3 attack.
+- **Why:** measured over 400 games in breach mode: median 10 rounds, Ironbound 48% vs Verdant 52%, 95% of games end in combat (`docs/reports/phase3-harness.md`).

@@ -125,7 +125,7 @@ export const TARGETS = {
 };
 
 export function targetChecks(s: Summary): { name: string; value: string; ok: boolean }[] {
-  const pct = (x: number) => `${Math.round(x * 100)}%`;
+  const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
   return [
     {
       name: "Games ended by combat (≥ 60%)",

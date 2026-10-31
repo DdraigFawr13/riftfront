@@ -1,10 +1,19 @@
-import { canAct, findTarget, forward, inBounds, other, terrainAt, unitAt } from "./board.ts";
+import {
+  canAct,
+  effectiveAttack,
+  findTarget,
+  forward,
+  inBounds,
+  other,
+  terrainAt,
+  unitAt,
+} from "./board.ts";
 import type { MatchState, PlayerId, Unit } from "./types.ts";
 
 /** These functions mutate a draft state; applyAction clones before calling them. */
 
 function wantsToStep(s: MatchState, u: Unit): number | null {
-  if (u.stance !== "advance" || !canAct(s, u) || findTarget(s, u)) return null;
+  if (u.structure || u.stance !== "advance" || !canAct(s, u) || findTarget(s, u)) return null;
   const to = u.col + forward(u.owner);
   if (!inBounds(s, u.lane, to) || terrainAt(s, u.lane, to)?.blocksMovement) return null;
   return to;
@@ -16,7 +25,7 @@ function wantsToStep(s: MatchState, u: Unit): number | null {
  * chain, so the result does not depend on array order.
  */
 export function resolveMovement(s: MatchState): void {
-  const maxMove = Math.max(0, ...s.units.map((u) => u.move));
+  const maxMove = Math.max(0, ...s.units.filter((u) => !u.structure).map((u) => u.move));
   for (let step = 1; step <= maxMove; step++) {
     const intents = new Map<number, number>();
     for (const u of s.units) {
@@ -52,19 +61,44 @@ export function resolveMovement(s: MatchState): void {
   }
 }
 
-/** Combat (D-007): targets from one snapshot, Guard interception, simultaneous damage. */
+/**
+ * Combat (D-007): targets from one snapshot, Guard interception, simultaneous damage. Terrain
+ * effects (D-013): Woodland +1 attack in Forest, Forest cover against ranged hits, Siege doubles
+ * damage to walls and structures.
+ */
 export function resolveCombat(s: MatchState): void {
   const attackers = [...s.units].sort((a, b) => a.uid - b.uid);
-  const planned = attackers.map((u) => ({ u, target: findTarget(s, u) }));
+  const planned = attackers.map((u) => ({
+    u,
+    atk: effectiveAttack(s, u),
+    target: findTarget(s, u),
+  }));
   const unitDamage = new Map<number, number>();
+  const terrainDamage = new Map<string, number>();
   const commanderDamage: [number, number] = [0, 0];
   const usedGuards = new Set<number>();
-  for (const { u, target } of planned) {
+  for (const { u, atk, target } of planned) {
     if (!target) continue;
+    const siege = u.keywords.includes("siege") ? 2 : 1;
     if (target.kind === "commander") {
       const victim = other(u.owner);
-      commanderDamage[victim] += u.attack;
-      s.events.push({ t: "commander_hit", uid: u.uid, player: victim, damage: u.attack });
+      commanderDamage[victim] += atk;
+      s.events.push({ t: "commander_hit", uid: u.uid, player: victim, damage: atk });
+      continue;
+    }
+    if (target.kind === "terrain") {
+      const key = `${target.lane},${target.col}`;
+      const dmg = atk * siege;
+      terrainDamage.set(key, (terrainDamage.get(key) ?? 0) + dmg);
+      const kind = terrainAt(s, target.lane, target.col)?.kind ?? "terrain";
+      s.events.push({
+        t: "attack_terrain",
+        uid: u.uid,
+        kind,
+        lane: target.lane,
+        col: target.col,
+        damage: dmg,
+      });
       continue;
     }
     const x = target.unit;
@@ -81,12 +115,14 @@ export function resolveCombat(s: MatchState): void {
       .sort((a, b) => a.lane - b.lane)[0];
     const hit = guard ?? x;
     if (guard) usedGuards.add(guard.uid);
-    unitDamage.set(hit.uid, (unitDamage.get(hit.uid) ?? 0) + u.attack);
+    let dmg = atk * (hit.structure ? siege : 1);
+    if (u.range >= 2) dmg = Math.max(0, dmg - (terrainAt(s, hit.lane, hit.col)?.rangedCover ?? 0));
+    unitDamage.set(hit.uid, (unitDamage.get(hit.uid) ?? 0) + dmg);
     s.events.push({
       t: "attack",
       uid: u.uid,
       target: hit.uid,
-      damage: u.attack,
+      damage: dmg,
       ...(guard ? { guardedBy: guard.uid } : {}),
     });
   }
@@ -96,6 +132,16 @@ export function resolveCombat(s: MatchState): void {
     s.players[u.owner].discard.push(u.cardId);
   }
   s.units = s.units.filter((u) => u.health > 0);
+  for (const [key, dmg] of terrainDamage) {
+    const t = s.terrain[key];
+    if (!t || t.hp === undefined) continue;
+    t.hp -= dmg;
+    if (t.hp <= 0) {
+      const [lane, col] = key.split(",").map(Number) as [number, number];
+      delete s.terrain[key];
+      s.events.push({ t: "terrain_destroyed", kind: t.kind, lane, col });
+    }
+  }
   const source = s.config.commanderDamageMode === "unblocked_lane" ? "unblocked" : "breach";
   for (const p of [0, 1] as PlayerId[]) {
     if (!commanderDamage[p]) continue;
