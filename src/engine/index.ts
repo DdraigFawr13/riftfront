@@ -12,6 +12,7 @@ export type { MatchSetup } from "./match.ts";
 export {
   canAct,
   canHitCommander,
+  effectiveAttack,
   findTarget,
   inBreachZone,
   laneBlockedAhead,
