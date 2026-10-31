@@ -42,6 +42,7 @@ function board(
     move: 1,
     stance: "advance",
     keywords: [],
+    structure: false,
     deployedRound: 1,
     repositionedRound: 0,
     ...u,

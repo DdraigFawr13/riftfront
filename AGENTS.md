@@ -1,6 +1,6 @@
 # Agent instructions
 
-Riftfront is a browser-first 1v1 tactical card battler: decks, Commanders, four lanes on an 8x4 grid, and mutable terrain. Owner: Morgan. Stage: plan approved 2026-10-31 (`docs/plan.md`); phase 2 (harness + AI) done; phase 3 (content) next.
+Riftfront is a browser-first 1v1 tactical card battler: decks, Commanders, four lanes on an 8x4 grid, and mutable terrain. Owner: Morgan. Stage: plan approved 2026-10-31 (`docs/plan.md`); phase 3 (content) done; phase 4 (phone UI) next.
 
 Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.claude/master/RULES.md`). This file holds only what is specific to this project. Keep it under 80 lines.
 
@@ -14,7 +14,7 @@ Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.clau
 ## Local checks (run before pushing)
 
 - Every push: `npm run check` (Prettier check, typecheck, Vitest) and `node .claude/master/sync.mjs --check`.
-- Play-by-play of a seeded match: `npm run sample -- <seed> [territorial_breach|unblocked_lane]`.
+- Play-by-play of a seeded Ironbound vs Verdant match: `npm run sample -- <seed> [territorial_breach|unblocked_lane]`. Card list: `npm run cards`.
 - AI-vs-AI report for both presets (about 1.5 min for 400 games each): `npm run sim -- [games] [seedStart]`. Run it locally, never in CI (CI-04).
 
 ## What CI runs

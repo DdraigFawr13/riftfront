@@ -45,19 +45,34 @@ export function canHitCommander(s: MatchState, u: Unit): boolean {
   return s.config.commanderDamageMode === "unblocked_lane" || inBreachZone(s, u);
 }
 
-export type Target = { kind: "commander" } | { kind: "unit"; unit: Unit };
+export type Target =
+  | { kind: "commander" }
+  | { kind: "unit"; unit: Unit }
+  | { kind: "terrain"; lane: number; col: number };
+
+/** Attack after terrain bonuses: Woodland units get +1 while standing in Forest. */
+export function effectiveAttack(s: MatchState, u: Unit): number {
+  const woods = u.keywords.includes("woodland") && terrainAt(s, u.lane, u.col)?.kind === "forest";
+  return u.attack + (woods ? 1 : 0);
+}
 
 /**
  * One attack per unit: the enemy Commander if the breach predicate holds, otherwise the nearest
- * enemy ahead in its lane within range. Friendly units don't block fire; blocking terrain does.
+ * enemy unit or enemy wall ahead in its lane within range. Friendly units don't block fire;
+ * blocking terrain does, and a unit never attacks its own side's wall.
  */
 export function findTarget(s: MatchState, u: Unit): Target | null {
-  if (!canAct(s, u) || u.attack <= 0) return null;
+  if (!canAct(s, u) || effectiveAttack(s, u) <= 0) return null;
   if (canHitCommander(s, u)) return { kind: "commander" };
   const f = forward(u.owner);
   for (let d = 1; d <= u.range; d++) {
     const c = u.col + f * d;
-    if (!inBounds(s, u.lane, c) || terrainAt(s, u.lane, c)?.blocksMovement) return null;
+    if (!inBounds(s, u.lane, c)) return null;
+    const t = terrainAt(s, u.lane, c);
+    if (t?.blocksMovement) {
+      const attackable = t.hp !== undefined && t.owner !== undefined && t.owner !== u.owner;
+      return attackable ? { kind: "terrain", lane: u.lane, col: c } : null;
+    }
     const v = unitAt(s, u.lane, c);
     if (v && v.owner !== u.owner) return { kind: "unit", unit: v };
   }
@@ -73,4 +88,9 @@ export function blockedByIntruder(s: MatchState, p: PlayerId, lane: number, col:
       inDeployZone(s, p, u.col) &&
       (u.owner === 0 ? col > u.col : col < u.col),
   );
+}
+
+export function inTerrainZone(s: MatchState, p: PlayerId, col: number): boolean {
+  const [lo, hi] = s.config.terrainZone[p];
+  return col >= lo && col <= hi;
 }

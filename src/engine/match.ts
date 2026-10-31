@@ -4,6 +4,7 @@ import {
   forward,
   inBounds,
   inDeployZone,
+  inTerrainZone,
   other,
   terrainAt,
   unitAt,
@@ -11,7 +12,7 @@ import {
 import { DEFAULT_RULES, RULES_VERSION, type RulesConfig } from "./config.ts";
 import { checkOutcome, resolveCombat, resolveMovement } from "./resolve.ts";
 import { deriveSeed, nextRandom, shuffle } from "./rng.ts";
-import type { Action, CardDb, MatchState, PlayerId, PlayerState } from "./types.ts";
+import type { Action, Card, CardDb, MatchState, PlayerId, PlayerState } from "./types.ts";
 
 export class IllegalActionError extends Error {}
 
@@ -103,39 +104,17 @@ export function applyAction(state: MatchState, action: Action): MatchState {
       const card = cardId ? s.cards[cardId] : undefined;
       if (!cardId || !card) throw new IllegalActionError("No such card in hand.");
       if (card.cost > me.energy) throw new IllegalActionError("Not enough energy.");
-      const why = deployProblem(s, action.player, action.lane, action.col);
+      const why = playProblem(s, action.player, card, action.lane, action.col);
       if (why) throw new IllegalActionError(why);
       me.energy -= card.cost;
       me.hand.splice(action.handIndex, 1);
-      const uid = s.nextUid++;
-      s.units.push({
-        uid,
-        cardId,
-        owner: action.player,
-        lane: action.lane,
-        col: action.col,
-        attack: card.attack,
-        health: card.health,
-        range: card.range,
-        move: card.move,
-        stance: card.stance ?? (card.range >= 2 ? "hold" : "advance"),
-        keywords: [...(card.keywords ?? [])],
-        deployedRound: s.round,
-        repositionedRound: 0,
-      });
-      s.events.push({
-        t: "play",
-        player: action.player,
-        cardId,
-        uid,
-        lane: action.lane,
-        col: action.col,
-      });
+      playCard(s, action.player, card, action.lane, action.col);
       break;
     }
     case "stance": {
       const u = s.units.find((v) => v.uid === action.uid && v.owner === action.player);
       if (!u) throw new IllegalActionError("No such unit.");
+      if (u.structure) throw new IllegalActionError("Structures have no stance.");
       if (u.stance === action.stance) throw new IllegalActionError("Already in that stance.");
       u.stance = action.stance;
       s.events.push({ t: "stance", uid: u.uid, stance: u.stance });
@@ -144,6 +123,7 @@ export function applyAction(state: MatchState, action: Action): MatchState {
     case "reposition": {
       const u = s.units.find((v) => v.uid === action.uid && v.owner === action.player);
       if (!u) throw new IllegalActionError("No such unit.");
+      if (u.structure) throw new IllegalActionError("Structures don't move.");
       if (!canAct(s, u)) throw new IllegalActionError("Units can't reposition on deploy.");
       if (u.repositionedRound === s.round) throw new IllegalActionError("Already repositioned.");
       const to = u.col + forward(u.owner) * action.step;
@@ -171,12 +151,90 @@ export function applyAction(state: MatchState, action: Action): MatchState {
   return s;
 }
 
-function deployProblem(s: MatchState, p: PlayerId, lane: number, col: number): string | null {
-  if (!inBounds(s, lane, col) || !inDeployZone(s, p, col)) return "Outside your deploy zone.";
+/** Tiles a terrain card covers, clipped to the board. The first is the target tile. */
+function terrainTiles(s: MatchState, card: Card, lane: number, col: number): [number, number][] {
+  if (card.kind !== "terrain" || card.shape === "single") return [[lane, col]];
+  return [lane, lane - 1, lane + 1]
+    .filter((l) => l >= 0 && l < s.config.lanes)
+    .map((l) => [l, col] as [number, number]);
+}
+
+/** Why `card` can't be played at the tile, or null if it can (D-004, D-013). */
+function playProblem(
+  s: MatchState,
+  p: PlayerId,
+  card: Card,
+  lane: number,
+  col: number,
+): string | null {
+  if (!inBounds(s, lane, col)) return "Off the board.";
+  if (card.kind === "equipment") {
+    const u = unitAt(s, lane, col);
+    return u && u.owner === p && !u.structure ? null : "Equipment needs one of your units.";
+  }
+  if (card.kind === "terrain") {
+    if (!inTerrainZone(s, p, col)) return "Terrain goes in your half.";
+    if (terrainAt(s, lane, col)) return "Tile already has terrain.";
+    if (card.terrain.blocksMovement) {
+      if (unitAt(s, lane, col)) return "Tile occupied.";
+      if (blockedByIntruder(s, p, lane, col)) return "Can't build ahead of an enemy intruder.";
+    }
+    return null;
+  }
+  if (!inDeployZone(s, p, col)) return "Outside your deploy zone.";
   if (unitAt(s, lane, col)) return "Tile occupied.";
   if (terrainAt(s, lane, col)?.blocksMovement) return "Terrain blocks this tile.";
   if (blockedByIntruder(s, p, lane, col)) return "Can't deploy ahead of an enemy intruder.";
   return null;
+}
+
+function playCard(s: MatchState, p: PlayerId, card: Card, lane: number, col: number): void {
+  if (card.kind === "equipment") {
+    const u = unitAt(s, lane, col)!;
+    u.attack += card.mods.attack ?? 0;
+    u.health += card.mods.health ?? 0;
+    u.range += card.mods.range ?? 0;
+    for (const k of card.mods.keywords ?? []) if (!u.keywords.includes(k)) u.keywords.push(k);
+    s.players[p].discard.push(card.id);
+    s.events.push({ t: "equip", player: p, cardId: card.id, uid: u.uid });
+    return;
+  }
+  if (card.kind === "terrain") {
+    for (const [l, c] of terrainTiles(s, card, lane, col)) {
+      if (terrainAt(s, l, c)) continue;
+      if (card.terrain.blocksMovement && unitAt(s, l, c)) continue;
+      s.terrain[`${l},${c}`] = { ...card.terrain, owner: p };
+      s.events.push({
+        t: "terrain",
+        player: p,
+        cardId: card.id,
+        kind: card.terrain.kind,
+        lane: l,
+        col: c,
+      });
+    }
+    s.players[p].discard.push(card.id);
+    return;
+  }
+  const uid = s.nextUid++;
+  const structure = card.kind === "structure";
+  s.units.push({
+    uid,
+    cardId: card.id,
+    owner: p,
+    lane,
+    col,
+    attack: card.attack,
+    health: card.health,
+    range: card.range,
+    move: structure ? 0 : card.move,
+    stance: structure ? "hold" : (card.stance ?? (card.range >= 2 ? "hold" : "advance")),
+    keywords: [...(card.keywords ?? [])],
+    structure,
+    deployedRound: s.round,
+    repositionedRound: 0,
+  });
+  s.events.push({ t: "play", player: p, cardId: card.id, uid, lane, col });
 }
 
 /** Every legal action for the active player; the AI and the harness choose from this list. */
@@ -199,10 +257,10 @@ export function legalActions(s: MatchState): Action[] {
     if (!card || card.cost > me.energy || me.hand.indexOf(cardId) !== handIndex) return;
     for (let lane = 0; lane < s.config.lanes; lane++)
       for (let col = 0; col < s.config.columns; col++)
-        if (!deployProblem(s, p, lane, col))
+        if (!playProblem(s, p, card, lane, col))
           out.push({ type: "play", player: p, handIndex, lane, col });
   });
-  for (const u of s.units.filter((v) => v.owner === p)) {
+  for (const u of s.units.filter((v) => v.owner === p && !v.structure)) {
     out.push({
       type: "stance",
       player: p,

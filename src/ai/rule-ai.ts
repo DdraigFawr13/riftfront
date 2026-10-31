@@ -23,6 +23,10 @@ export interface AiWeights {
   unitPower: number;
   advance: number;
   breachThreat: number;
+  /** Value of each own wall per point of its health. */
+  wallHp: number;
+  /** Value of each own Forest tile, plus the same again if a Woodland unit stands in it. */
+  forest: number;
   /** A play must beat passing by this much, so the AI doesn't act for noise. */
   minGain: number;
 }
@@ -31,6 +35,8 @@ export const DEFAULT_WEIGHTS: AiWeights = {
   unitPower: 1,
   advance: 0.25,
   breachThreat: 2,
+  wallHp: 0.3,
+  forest: 0.5,
   minGain: 0.01,
 };
 
@@ -55,6 +61,18 @@ export function evaluate(s: MatchState, me: PlayerId, w: AiWeights = DEFAULT_WEI
     return v;
   };
   for (const u of s.units) score += u.owner === me ? unitValue(u) : -unitValue(u);
+  // Terrain pays off over later rounds, which the one-round preview cannot see.
+  for (const [key, t] of Object.entries(s.terrain)) {
+    if (t.owner === undefined) continue;
+    let v = 0;
+    if (t.hp !== undefined) v = t.hp * w.wallHp;
+    if (t.kind === "forest") {
+      const [lane, col] = key.split(",").map(Number);
+      const here = s.units.find((u) => u.lane === lane && u.col === col);
+      v = w.forest + (here?.owner === t.owner && here.keywords.includes("woodland") ? w.forest : 0);
+    }
+    score += t.owner === me ? v : -v;
+  }
   return score;
 }
 

@@ -20,6 +20,14 @@ export function describeEvent(s: MatchState, e: GameEvent, names: Map<number, st
       return `${side(e.player)} redraws ${e.count} card(s)`;
     case "play":
       return `${side(e.player)} plays ${n(e.uid)} at ${at(e.lane, e.col)}`;
+    case "terrain":
+      return `${side(e.player)} places ${e.kind} at ${at(e.lane, e.col)}`;
+    case "equip":
+      return `${side(e.player)} equips ${n(e.uid)} with ${s.cards[e.cardId]?.name ?? e.cardId}`;
+    case "attack_terrain":
+      return `${n(e.uid)} hits the ${e.kind} at ${at(e.lane, e.col)} for ${e.damage}`;
+    case "terrain_destroyed":
+      return `The ${e.kind} at ${at(e.lane, e.col)} is destroyed`;
     case "stance":
       return `${n(e.uid)} switches to ${e.stance}`;
     case "reposition":
