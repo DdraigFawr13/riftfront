@@ -13,10 +13,11 @@ Shared rules come from AI-Master-Instructions and load through CLAUDE.md (`.clau
 
 ## Local checks (run before pushing)
 
-- Every push: `npm run check` (Prettier check, typecheck, Vitest), `npm run build` (includes the 90 KB first-load budget) and `node .claude/master/sync.mjs --check`.
+- Every push: `npm run check` (test-traps warnings, Prettier check, typecheck, Vitest), `npm run build` (includes the 90 KB first-load budget) and `node .claude/master/sync.mjs --check`.
+- Test time budgets: `npm run check` under 60 s (measured 8.9 s on 2026-11-03, 61 tests); `npx vitest run` under 20 s (2.8 s). Over budget: use the `test-design` skill.
 - UI changes: `npm run dev`, then look at it at 844×390 (phone landscape) before calling it done (VER-06).
 - Play-by-play of a seeded Ironbound vs Verdant match: `npm run sample -- <seed> [territorial_breach|unblocked_lane]`. Card list: `npm run cards`.
-- AI-vs-AI report for both presets (about 1.5 min for 400 games each): `npm run sim -- [games] [seedStart]`. Run it locally, never in CI (CI-04).
+- AI-vs-AI report for both presets (about 1.5 min for 400 games each): `npm run sim -- [games] [seedStart]`. Run it locally, never in CI (CI-02).
 
 ## What CI runs
 
